@@ -64,7 +64,6 @@
 
     <v-dialog v-model="dialog" width="500">
       <v-card>
-        qwe {{editTask}}
         <v-card-title>
           {{ props.modalAction === ModalAction.Add ? 'Add New Task' : 'Edit Task' }}
         </v-card-title>

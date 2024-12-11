@@ -108,6 +108,9 @@
       </v-col>
     </v-row>
 
-    <AddTaskModal :task="editTask" :modal-action="ModalAction.Edit" v-model="dialog" :status="Status.TODO"></AddTaskModal>
+    <template v-if="editTask">
+      <AddTaskModal :task="editTask" :modal-action="ModalAction.Edit" v-model="dialog" :status="Status.TODO"></AddTaskModal>
+    </template>
+
   </v-container>
 </template>
