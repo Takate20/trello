@@ -6,6 +6,8 @@ import { Status } from "../utils/Task.js";
 
 const taskStore = useTaskStore();
 const tasks = reactive(taskStore.tasks);
+const dialog = ref(true)
+const editTask = ref(null)
 
 const todoTasks = computed(() => tasks.filter(task => task.status === Status.TODO));
 const inProgressTasks = computed(() => tasks.filter(task => task.status === Status.IN_PROGRESS));
@@ -45,6 +47,7 @@ const saveToLocalStorage = () => {
 </script>
 
 <template>
+  dsfd{{editTask}}
   <v-container>
     <v-row no-gutters>
       <v-col cols="12">
@@ -96,7 +99,7 @@ const saveToLocalStorage = () => {
               @change="event => updateTaskStatusAndOrder(event, Status.DONE, doneTasks)"
             >
               <template #item="{ element: task }">
-                <v-card class="cursor-grab mb-3" style="user-select: none; background: #22272B">
+                <v-card @click="editTask = task" class="cursor-grab mb-3" style="user-select: none; background: #22272B">
                   <v-card-title class="text-white">
                     {{ task.title }}
                   </v-card-title>
@@ -108,5 +111,7 @@ const saveToLocalStorage = () => {
         </div>
       </v-col>
     </v-row>
+
+    <AddTaskModal :task="editTask" v-model="dialog" :status="Status.DONE"></AddTaskModal>
   </v-container>
 </template>

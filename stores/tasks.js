@@ -30,6 +30,10 @@ export const useTaskStore = defineStore(
             }
         };
 
+        const updateTaskById = (index, task) => {
+            tasks.value[index] = task
+        }
+
         const getTasks = () => tasks.value;
 
         return {

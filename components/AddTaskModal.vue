@@ -1,7 +1,7 @@
 <script setup>
 import {ref} from "vue";
 import {useTaskStore} from "../stores/tasks.js";
-import {Status, Task} from "../utils/Task.js";
+import {Status, ModalAction, Task} from "../utils/Task.js";
 
 const props = defineProps({
   status: {
@@ -11,9 +11,22 @@ const props = defineProps({
       return Object.values(Status).includes(value);
     }
   },
+  task: {
+    type: Object,
+    default: null
+  }
 });
 
-const dialog = ref(false);
+const modalAction = computed(() => {
+  if (props.task) {
+    return ModalAction.Edit
+  } else {
+    return ModalAction.Add
+  }
+})
+
+const dialog = defineModel(false)
+
 const taskData = ref({
   title: "",
   desc: "",
@@ -22,6 +35,13 @@ const taskData = ref({
   status: props.status,
   priority: 1,
 });
+
+
+watchEffect(() => {
+  if(props.task) {
+    dialog.value = true
+  }
+})
 
 const addTask = async () => {
   const taskStore = useTaskStore();
@@ -64,8 +84,8 @@ const resetForm = () => {
         </v-card-text>
 
         <v-card-actions>
-          <v-btn text @click="dialog = false">Скасувати</v-btn>
-          <v-btn color="primary" text @click="addTask">Додати</v-btn>
+          <v-btn @click="dialog = false">Скасувати</v-btn>
+          <v-btn color="primary" @click="addTask">{{ modalAction === ModalAction.Add ? Додати : Редагувати }} </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

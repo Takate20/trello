@@ -14,3 +14,8 @@ export class Task {
         this.priority = priority;
     }
 }
+
+export const ModalAction = Object.freeze({
+    Add: 'Add',
+    Edit: 'Edit',
+});
