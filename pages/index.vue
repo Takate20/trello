@@ -3,15 +3,20 @@
   import draggable from "vuedraggable";
   import {useTaskStore} from "../stores/tasks.js";
   import {Status} from "../utils/Task.js";
+  import {usePeopleStore} from "../stores/people.js";
 
-  const taskStore = useTaskStore();
-  const tasks = ref(taskStore.tasks);
+  const tasks = useTaskStore().tasks;
   const dialog = ref(false);
   const editTask = ref(null);
 
-  const todoTasks = computed(() => tasks.value.filter(task => task.status === Status.TODO));
-  const inProgressTasks = computed(() => tasks.value.filter(task => task.status === Status.IN_PROGRESS));
-  const doneTasks = computed(() => tasks.value.filter(task => task.status === Status.DONE));
+  const display = ref(useDisplay())
+  const isDragging = ref(false);
+
+  const todoTasks = computed(() => tasks.filter(task => task.status === Status.TODO));
+  const inProgressTasks = computed(() => tasks.filter(task => task.status === Status.IN_PROGRESS));
+  const doneTasks = computed(() => tasks.filter(task => task.status === Status.DONE));
+
+  const peopleStore = usePeopleStore();
 
   const updateTaskStatusAndOrder = (event, newStatus, taskList) => {
     const {added, moved} = event;
@@ -35,6 +40,8 @@
       tasks.splice(globalOldIndex, 1);
       const globalNewIndex = tasks.findIndex(t => taskList[newIndex]);
       tasks.splice(globalNewIndex, 0, task);
+
+      console.log(`${globalOldIndex} ${newIndex}`)
     }
 
     saveToLocalStorage();
@@ -51,6 +58,7 @@
       editTask.value = null
     }
   })
+
   const saveToLocalStorage = () => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   };
@@ -58,33 +66,42 @@
 </script>
 
 <template>
-  {{editTask}}
   <v-container>
     <v-row no-gutters>
       <v-col cols="12">
-        <div class="d-flex align-start">
-          <v-card class="pa-5 mr-3" rounded="xl" min-width="250" style="background: #101204">
+        <div class="d-flex align-start flex-column flex-md-row mx-auto align-center align-md-start ga-4">
+          <v-card class="pa-5" rounded="xl" :min-width="250" style="background: #101204">
             <span class="text-white d-block mb-3">TODO</span>
-            <draggable :list="todoTasks" group="tasks" item-key="id" @change="event => updateTaskStatusAndOrder(event, Status.TODO, todoTasks)">
+            <draggable :list="todoTasks" group="tasks" item-key="id" @change="event => updateTaskStatusAndOrder(event, Status.TODO, todoTasks)" @start="isDragging = true" @end="isDragging = false">
               <template #item="{ element: task }">
-                <v-card class="cursor-grab mb-3" style="user-select: none; background: #22272B">
+                <v-card @click="editTask = task" class="mb-3" :class="{ 'cursor-grab': isDragging }" style="user-select: none; background: #22272B">
                   <v-card-title class="text-white">
                     {{ task.title }}
                   </v-card-title>
+                  <v-card-actions v-if="task.workers.length > 0" class="d-flex justify-end">
+                    <v-avatar v-for="workerId in task.workers">
+                      <v-img :src="peopleStore.getPersonById(workerId).avatar"></v-img>
+                    </v-avatar>
+                  </v-card-actions>
                 </v-card>
               </template>
             </draggable>
             <AddTaskModal :status="Status.TODO"></AddTaskModal>
           </v-card>
 
-          <v-card class="pa-5 mr-3" rounded="xl" min-width="250" style="background: #101204">
+          <v-card class="pa-5" rounded="xl" min-width="250" style="background: #101204">
             <span class="text-white d-block mb-3">In Progress</span>
-            <draggable :list="inProgressTasks" group="tasks" item-key="id" @change="event => updateTaskStatusAndOrder(event, Status.IN_PROGRESS, inProgressTasks)">
+            <draggable :list="inProgressTasks" group="tasks" item-key="id" @change="event => updateTaskStatusAndOrder(event, Status.IN_PROGRESS, inProgressTasks)"  @start="isDragging = true" @end="isDragging = false">
               <template #item="{ element: task }">
-                <v-card class="cursor-grab mb-3" style="user-select: none; background: #22272B">
+                <v-card @click="editTask = task" class="mb-3" :class="{ 'cursor-grab': isDragging }" style="user-select: none; background: #22272B">
                   <v-card-title class="text-white">
                     {{ task.title }}
                   </v-card-title>
+                  <v-card-actions v-if="task.workers.length > 0" class="d-flex justify-end">
+                    <v-avatar v-for="workerId in task.workers">
+                      <v-img :src="peopleStore.getPersonById(workerId).avatar"></v-img>
+                    </v-avatar>
+                  </v-card-actions>
                 </v-card>
               </template>
             </draggable>
@@ -93,12 +110,17 @@
 
           <v-card class="pa-5" rounded="xl" min-width="250" style="background: #101204">
             <span class="text-white d-block mb-3">Done</span>
-            <draggable :list="doneTasks" group="tasks" item-key="id" @change="event => updateTaskStatusAndOrder(event, Status.DONE, doneTasks)">
+            <draggable :list="doneTasks" group="tasks" item-key="id" @change="event => updateTaskStatusAndOrder(event, Status.DONE, doneTasks)"  @start="isDragging = true" @end="isDragging = false">
               <template #item="{ element: task }">
-                <v-card @click="editTask = task" class="cursor-grab mb-3" style="user-select: none; background: #22272B">
+                <v-card @click="editTask = task" class="mb-3" :class="{ 'cursor-grab': isDragging }" style="user-select: none; background: #22272B">
                   <v-card-title class="text-white">
                     {{ task.title }}
                   </v-card-title>
+                  <v-card-actions v-if="task.workers.length > 0" class="d-flex justify-end">
+                    <v-avatar v-for="workerId in task.workers">
+                      <v-img :src="peopleStore.getPersonById(workerId).avatar"></v-img>
+                    </v-avatar>
+                  </v-card-actions>
                 </v-card>
               </template>
             </draggable>

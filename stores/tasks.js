@@ -7,6 +7,7 @@ export const useTaskStore = defineStore(
 
         const addTask = (task) => {
             const taskToPlainObject = (task) => ({
+                id: tasks.value.length,
                 title: task.title,
                 desc: task.desc,
                 creator: task.creator,
@@ -18,7 +19,8 @@ export const useTaskStore = defineStore(
             tasks.value.push(taskToPlainObject(task));
         };
 
-        const deleteTask = (index) => {
+        const deleteTask = (id) => {
+            const index = tasks.value.findIndex(task => task.id === id);
             tasks.value.splice(index, 1);
         };
 
@@ -30,9 +32,14 @@ export const useTaskStore = defineStore(
             }
         };
 
-        const updateTaskById = (index, task) => {
-            tasks.value[index] = task
-        }
+        const editTask = (updatedTask) => {
+            const index = tasks.value.findIndex(task => task.id === updatedTask.id);
+            console.log(index)
+            console.log(updatedTask);
+            if (index !== -1) {
+                tasks.value[index] = { ...updatedTask };
+            }
+        };
 
         const getTasks = () => tasks.value;
 
@@ -40,6 +47,7 @@ export const useTaskStore = defineStore(
             tasks,
             addTask,
             deleteTask,
+            editTask,
             updateTaskStatus,
             getTasks,
             Status,

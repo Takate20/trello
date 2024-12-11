@@ -5,7 +5,8 @@ export const Status = Object.freeze({
 });
 
 export class Task {
-    constructor({title, desc, creator, workers, status = Status.TODO, priority = 0}) {
+    constructor({id, title, desc, creator, workers, status = Status.TODO, priority = 0}) {
+        this.id = id;
         this.title = title;
         this.desc = desc;
         this.creator = creator;
