@@ -17,13 +17,14 @@ export default defineNuxtConfig({
 
     css: [
         'vuetify/lib/styles/main.sass',
+        "@/assets/main.scss",
     ],
 
     build: {
         transpile: ['vuetify'],
     },
     modules: [
-        'vuetify-nuxt-module', '@pinia/nuxt',
+        'vuetify-nuxt-module',
         '@pinia/nuxt',
         'pinia-plugin-persistedstate/nuxt',
     ],
@@ -36,13 +37,6 @@ export default defineNuxtConfig({
         },
         define: {
             'process.env.DEBUG': false,
-        },
-        css: {
-            preprocessorOptions: {
-                scss: {
-                    additionalData: '@use "~/assets/colors.scss" as *;'
-                }
-            }
         },
     },
     devServer: {

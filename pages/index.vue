@@ -11,8 +11,44 @@ const todoTasks = computed(() => tasks.filter(task => task.status === Status.TOD
 const inProgressTasks = computed(() => tasks.filter(task => task.status === Status.IN_PROGRESS));
 const doneTasks = computed(() => tasks.filter(task => task.status === Status.DONE));
 
+// const updateTaskStatusAndOrder = (event, newStatus, taskList) => {
+//   const { added, moved } = event;
+//
+//   // Якщо елемент додано в новий список
+//   if (added) {
+//     const task = added.element;
+//     const newIndex = added.newIndex;
+//
+//     // Змінюємо статус таска
+//     task.status = newStatus;
+//
+//     // Оновлюємо основний масив tasks
+//     const oldIndex = tasks.findIndex(t => t === task);
+//     tasks.splice(oldIndex, 1); // Видаляємо з попередньої позиції
+//     tasks.splice(newIndex, 0, task); // Додаємо на нову позицію
+//   }
+//
+//   // Якщо елемент переміщено в межах списку
+//   if (moved) {
+//     const { newIndex, oldIndex } = moved;
+//     const task = taskList[oldIndex];
+//
+//     // Переміщуємо елемент в tasks
+//     const globalOldIndex = tasks.findIndex(t => t === task);
+//     tasks.splice(globalOldIndex, 1); // Видаляємо зі старої позиції
+//     const globalNewIndex = tasks.findIndex(t => taskList[newIndex]);
+//     tasks.splice(globalNewIndex, 0, task); // Додаємо на нову позицію
+//   }
+//
+//   saveToLocalStorage();
+// };
+//
+
+
 const updateTaskStatus = (task, newStatus) => {
   const index = tasks.findIndex(t => t === task);
+
+  console.log(`index: ${index}`)
   if (index !== -1) {
     taskStore.updateTaskStatus(index, newStatus);
     saveToLocalStorage();
@@ -37,60 +73,65 @@ loadFromLocalStorage();
   <v-container>
     <v-row no-gutters>
       <v-col cols="12">
-        <div class="d-flex">
-
-          <v-card class="bg-red pa-5">
-            <span>TODO</span>
+        <div class="d-flex align-start">
+          <v-card class="pa-5 mr-3" rounded="xl" min-width="250" style="background: #101204">
+            <span class="text-white d-block mb-3">TODO</span>
             <draggable
-              v-model="todoTasks"
+              :list="todoTasks"
               group="tasks"
+              :move="(event) => {console.log(event)}"
+              item-key="id"
               @change="({ added }) => added && updateTaskStatus(added.element, Status.TODO)"
             >
-              <template>
-
-              </template>
               <template #item="{ element: task }">
-                <v-card class="cursor-grab" style="user-select: none">
-                  <v-card-title>
+                <v-card min-width="200" class="cursor-grab mb-3" style="user-select: none; background: #22272B">
+                  <v-card-title class="text-white">
                     {{ task.title }}
                   </v-card-title>
                 </v-card>
               </template>
             </draggable>
+            <AddTaskModal :status="Status.TODO"></AddTaskModal>
           </v-card>
 
-          <v-card class="bg-red pa-5">
-            <span class="text-uppercase">In Progress</span>
+          <v-card class="pa-5 mr-3" min-width="250" rounded="xl" style="background: #101204">
+            <span class="text-white d-block mb-3">In Progress</span>
             <draggable
-              v-model="inProgressTasks"
+              :list="inProgressTasks"
               group="tasks"
+              item-key="id"
               @change="({ added }) => added && updateTaskStatus(added.element, Status.IN_PROGRESS)"
             >
               <template #item="{ element: task }">
-                <v-card class="cursor-grab" style="user-select: none">
-                  <v-card-title>
+                <v-card class="cursor-grab mb-3"  style="user-select: none; background: #22272B">
+                  <v-card-title class="text-white">
                     {{ task.title }}
                   </v-card-title>
                 </v-card>
               </template>
             </draggable>
+            <AddTaskModal :status="Status.IN_PROGRESS"></AddTaskModal>
           </v-card>
 
-          <v-card class="bg-red pa-5">
-            <span class="text-uppercase">Done</span>
+          <v-card class="pa-5" min-width="250"  rounded="xl" style="background: #101204">
+            <span class="text-white d-block mb-3">Done</span>
             <draggable
-              v-model="doneTasks"
+              :list="doneTasks"
               group="tasks"
+              item-key="id"
               @change="({ added }) => added && updateTaskStatus(added.element, Status.DONE)"
             >
+<!--              <template #header></template>-->
+<!--              <template #footer></template>-->
               <template #item="{ element: task }">
-                <v-card class="cursor-grab" style="user-select: none">
-                  <v-card-title>
+                <v-card class="cursor-grab mb-3" style="user-select: none; background: #22272B">
+                  <v-card-title class="text-white">
                     {{ task.title }}
                   </v-card-title>
                 </v-card>
               </template>
             </draggable>
+            <AddTaskModal :status="Status.DONE"></AddTaskModal>
           </v-card>
         </div>
       </v-col>
