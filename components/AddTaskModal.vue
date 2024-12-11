@@ -30,7 +30,7 @@ const taskData = ref({
   id: editedTask?.id ?? -1,
   title: editedTask?.title ?? '',
   desc: editedTask?.desc ?? '',
-  creator: editedTask?.creator ?? '',
+  creator: editedTask?.creator ?? [],
   workers: editedTask?.workers ?? [],
   status: editedTask?.status ?? props.status,
   priority: 1,
@@ -45,6 +45,7 @@ const addTask = async () => {
 
 const editTask = async () => {
   const taskStore = useTaskStore();
+  console.log(`editedTask: ${taskData?.value.id}`)
   taskStore.editTask(taskData.value)
   resetForm();
   dialog.value = false;
@@ -61,7 +62,7 @@ const resetForm = () => {
   taskData.value = {
     title: "",
     desc: "",
-    creator: "",
+    creator: [],
     workers: [],
     status: props.status,
     priority: 1,
@@ -79,6 +80,7 @@ const resetForm = () => {
     <v-dialog v-model="dialog" width="500">
       <v-card>
         <v-card-title>
+          {{taskData.creator}}
           {{ props.modalAction === ModalAction.Add ? 'Add New Task' : 'Edit Task' }}
         </v-card-title>
 

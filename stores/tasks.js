@@ -34,8 +34,6 @@ export const useTaskStore = defineStore(
 
         const editTask = (updatedTask) => {
             const index = tasks.value.findIndex(task => task.id === updatedTask.id);
-            console.log(index)
-            console.log(updatedTask);
             if (index !== -1) {
                 tasks.value[index] = { ...updatedTask };
             }

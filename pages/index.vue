@@ -22,6 +22,7 @@
     const {added, moved} = event;
 
     if (added) {
+      console.log('add')
       const task = added.element;
       const newIndex = added.newIndex;
 
@@ -32,7 +33,9 @@
       tasks.splice(newIndex, 0, task);
     }
 
+
     if (moved) {
+      console.log("move")
       const {newIndex, oldIndex} = moved;
       const task = taskList[oldIndex];
 
@@ -40,8 +43,6 @@
       tasks.splice(globalOldIndex, 1);
       const globalNewIndex = tasks.findIndex(t => taskList[newIndex]);
       tasks.splice(globalNewIndex, 0, task);
-
-      console.log(`${globalOldIndex} ${newIndex}`)
     }
 
     saveToLocalStorage();
@@ -60,12 +61,14 @@
   })
 
   const saveToLocalStorage = () => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    console.log(tasks)
+    localStorage.setItem("taskStore", JSON.stringify(tasks));
   };
 
 </script>
 
 <template>
+  {{useTaskStore().tasks}}
   <v-container>
     <v-row no-gutters>
       <v-col cols="12">
@@ -80,7 +83,7 @@
                   </v-card-title>
                   <v-card-actions v-if="task.workers.length > 0" class="d-flex justify-end">
                     <v-avatar v-for="workerId in task.workers">
-                      <v-img :src="peopleStore.getPersonById(workerId).avatar"></v-img>
+                      <v-img :src="peopleStore.getPersonById(workerId)?.avatar"></v-img>
                     </v-avatar>
                   </v-card-actions>
                 </v-card>
@@ -99,7 +102,7 @@
                   </v-card-title>
                   <v-card-actions v-if="task.workers.length > 0" class="d-flex justify-end">
                     <v-avatar v-for="workerId in task.workers">
-                      <v-img :src="peopleStore.getPersonById(workerId).avatar"></v-img>
+                      <v-img :src="peopleStore.getPersonById(workerId)?.avatar"></v-img>
                     </v-avatar>
                   </v-card-actions>
                 </v-card>
@@ -118,7 +121,7 @@
                   </v-card-title>
                   <v-card-actions v-if="task.workers.length > 0" class="d-flex justify-end">
                     <v-avatar v-for="workerId in task.workers">
-                      <v-img :src="peopleStore.getPersonById(workerId).avatar"></v-img>
+                      <v-img :src="peopleStore.getPersonById(workerId)?.avatar"></v-img>
                     </v-avatar>
                   </v-card-actions>
                 </v-card>
