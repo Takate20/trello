@@ -46,6 +46,9 @@ loadFromLocalStorage();
               group="tasks"
               @change="({ added }) => added && updateTaskStatus(added.element, Status.TODO)"
             >
+              <template>
+
+              </template>
               <template #item="{ element: task }">
                 <v-card class="cursor-grab" style="user-select: none">
                   <v-card-title>
