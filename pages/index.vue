@@ -11,62 +11,37 @@ const todoTasks = computed(() => tasks.filter(task => task.status === Status.TOD
 const inProgressTasks = computed(() => tasks.filter(task => task.status === Status.IN_PROGRESS));
 const doneTasks = computed(() => tasks.filter(task => task.status === Status.DONE));
 
-// const updateTaskStatusAndOrder = (event, newStatus, taskList) => {
-//   const { added, moved } = event;
-//
-//   // Якщо елемент додано в новий список
-//   if (added) {
-//     const task = added.element;
-//     const newIndex = added.newIndex;
-//
-//     // Змінюємо статус таска
-//     task.status = newStatus;
-//
-//     // Оновлюємо основний масив tasks
-//     const oldIndex = tasks.findIndex(t => t === task);
-//     tasks.splice(oldIndex, 1); // Видаляємо з попередньої позиції
-//     tasks.splice(newIndex, 0, task); // Додаємо на нову позицію
-//   }
-//
-//   // Якщо елемент переміщено в межах списку
-//   if (moved) {
-//     const { newIndex, oldIndex } = moved;
-//     const task = taskList[oldIndex];
-//
-//     // Переміщуємо елемент в tasks
-//     const globalOldIndex = tasks.findIndex(t => t === task);
-//     tasks.splice(globalOldIndex, 1); // Видаляємо зі старої позиції
-//     const globalNewIndex = tasks.findIndex(t => taskList[newIndex]);
-//     tasks.splice(globalNewIndex, 0, task); // Додаємо на нову позицію
-//   }
-//
-//   saveToLocalStorage();
-// };
-//
+const updateTaskStatusAndOrder = (event, newStatus, taskList) => {
+  const { added, moved } = event;
 
+  if (added) {
+    const task = added.element;
+    const newIndex = added.newIndex;
 
-const updateTaskStatus = (task, newStatus) => {
-  const index = tasks.findIndex(t => t === task);
+    task.status = newStatus;
 
-  console.log(`index: ${index}`)
-  if (index !== -1) {
-    taskStore.updateTaskStatus(index, newStatus);
-    saveToLocalStorage();
+    const oldIndex = tasks.findIndex(t => t === task);
+    tasks.splice(oldIndex, 1);
+    tasks.splice(newIndex, 0, task);
   }
+
+  if (moved) {
+    const { newIndex, oldIndex } = moved;
+    const task = taskList[oldIndex];
+
+    const globalOldIndex = tasks.findIndex(t => t === task);
+    tasks.splice(globalOldIndex, 1);
+    const globalNewIndex = tasks.findIndex(t => taskList[newIndex]);
+    tasks.splice(globalNewIndex, 0, task);
+  }
+
+  saveToLocalStorage();
 };
 
 const saveToLocalStorage = () => {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
-const loadFromLocalStorage = () => {
-  const savedTasks = JSON.parse(localStorage.getItem("tasks"));
-  if (savedTasks) {
-    tasks.splice(0, tasks.length, ...savedTasks);
-  }
-};
-
-loadFromLocalStorage();
 </script>
 
 <template>
@@ -79,12 +54,11 @@ loadFromLocalStorage();
             <draggable
               :list="todoTasks"
               group="tasks"
-              :move="(event) => {console.log(event)}"
               item-key="id"
-              @change="({ added }) => added && updateTaskStatus(added.element, Status.TODO)"
+              @change="event => updateTaskStatusAndOrder(event, Status.TODO, todoTasks)"
             >
               <template #item="{ element: task }">
-                <v-card min-width="200" class="cursor-grab mb-3" style="user-select: none; background: #22272B">
+                <v-card class="cursor-grab mb-3" style="user-select: none; background: #22272B">
                   <v-card-title class="text-white">
                     {{ task.title }}
                   </v-card-title>
@@ -94,13 +68,13 @@ loadFromLocalStorage();
             <AddTaskModal :status="Status.TODO"></AddTaskModal>
           </v-card>
 
-          <v-card class="pa-5 mr-3" min-width="250" rounded="xl" style="background: #101204">
+          <v-card class="pa-5 mr-3" rounded="xl" min-width="250" style="background: #101204">
             <span class="text-white d-block mb-3">In Progress</span>
             <draggable
               :list="inProgressTasks"
               group="tasks"
               item-key="id"
-              @change="({ added }) => added && updateTaskStatus(added.element, Status.IN_PROGRESS)"
+              @change="event => updateTaskStatusAndOrder(event, Status.IN_PROGRESS, inProgressTasks)"
             >
               <template #item="{ element: task }">
                 <v-card class="cursor-grab mb-3"  style="user-select: none; background: #22272B">
@@ -113,16 +87,14 @@ loadFromLocalStorage();
             <AddTaskModal :status="Status.IN_PROGRESS"></AddTaskModal>
           </v-card>
 
-          <v-card class="pa-5" min-width="250"  rounded="xl" style="background: #101204">
+          <v-card class="pa-5" rounded="xl" min-width="250" style="background: #101204">
             <span class="text-white d-block mb-3">Done</span>
             <draggable
               :list="doneTasks"
               group="tasks"
               item-key="id"
-              @change="({ added }) => added && updateTaskStatus(added.element, Status.DONE)"
+              @change="event => updateTaskStatusAndOrder(event, Status.DONE, doneTasks)"
             >
-<!--              <template #header></template>-->
-<!--              <template #footer></template>-->
               <template #item="{ element: task }">
                 <v-card class="cursor-grab mb-3" style="user-select: none; background: #22272B">
                   <v-card-title class="text-white">
