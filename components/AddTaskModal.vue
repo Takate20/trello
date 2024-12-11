@@ -1,61 +1,59 @@
 <script setup>
-import {ref} from "vue";
-import {useTaskStore} from "../stores/tasks.js";
-import {Status, ModalAction, Task} from "../utils/Task.js";
+  import {ref} from "vue";
+  import {useTaskStore} from "../stores/tasks.js";
+  import {Status, ModalAction, Task} from "../utils/Task.js";
 
-const props = defineProps({
-  status: {
-    type: String,
-    required: true,
-    validator(value) {
-      return Object.values(Status).includes(value);
+  const props = defineProps({
+    status: {
+      type: String,
+      required: true,
+      validator(value) {
+        return Object.values(Status).includes(value);
+      }
+    },
+    task: {
+      type: Object,
+      default: null
+    },
+    modalAction: {
+      type: String,
+      default: ModalAction.Add
     }
-  },
-  task: {
-    type: Object,
-    default: null
-  },
-  modalAction: {
-    type: String,
-    default: ModalAction.Add
-  }
-});
+  });
 
-const dialog = defineModel(false)
+  const dialog = defineModel(false)
+  const editTask = ref(props.task)
 
-const taskData = ref({
-  title: "",
-  desc: "",
-  creator: "",
-  workers: "",
-  status: props.status,
-  priority: 1,
-});
+  const taskData = computed(() => {
+      return {
+        title: editTask.value ? editTask.value.title : '',
+        desc: editTask.value ? editTask.value.desc: '',
+        creator: editTask.value ? editTask.value.creator: '',
+        workers: editTask.value ? editTask.value.workers: '',
+        status: editTask.value ? editTask.value.status: props.status,
+        priority: 1,
+      }
+    }
+  );
 
-
-watchEffect(() => {
-  if(props.task) {
-    dialog.value = true
-  }
-})
-
-const addTask = async () => {
-  const taskStore = useTaskStore();
-  taskStore.addTask(new Task({...taskData.value}));
-  resetForm();
-  dialog.value = false;
-};
-
-const resetForm = () => {
-  taskData.value = {
-    title: "",
-    desc: "",
-    creator: "",
-    workers: "",
-    status: props.status,
-    priority: 1,
+  const addTask = async () => {
+    const taskStore = useTaskStore();
+    taskStore.addTask(new Task({...taskData.value}));
+    resetForm();
+    dialog.value = false;
   };
-};
+
+  const resetForm = () => {
+    taskData.value = {
+      title: "",
+      desc: "",
+      creator: "",
+      workers: "",
+      status: props.status,
+      priority: 1,
+    };
+  };
+
 </script>
 
 <template>
@@ -66,8 +64,9 @@ const resetForm = () => {
 
     <v-dialog v-model="dialog" width="500">
       <v-card>
+        qwe {{editTask}}
         <v-card-title>
-          Add New Task
+          {{ props.modalAction === ModalAction.Add ? 'Add New Task' : 'Edit Task' }}
         </v-card-title>
 
         <v-card-text>
@@ -81,7 +80,7 @@ const resetForm = () => {
 
         <v-card-actions>
           <v-btn @click="dialog = false">Скасувати</v-btn>
-          <v-btn color="primary" @click="addTask">{{ modalAction === ModalAction.Add ? Додати : Редагувати }} </v-btn>
+          <v-btn color="primary" @click="addTask">{{ props.modalAction === ModalAction.Add ? 'Додати' : 'Редагувати' }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
