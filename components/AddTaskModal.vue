@@ -14,16 +14,12 @@ const props = defineProps({
   task: {
     type: Object,
     default: null
+  },
+  modalAction: {
+    type: String,
+    default: ModalAction.Add
   }
 });
-
-const modalAction = computed(() => {
-  if (props.task) {
-    return ModalAction.Edit
-  } else {
-    return ModalAction.Add
-  }
-})
 
 const dialog = defineModel(false)
 
@@ -64,8 +60,8 @@ const resetForm = () => {
 
 <template>
   <div>
-    <v-btn @click="dialog = true">
-      Add
+    <v-btn v-if="props.modalAction === ModalAction.Add" @click="dialog = true">
+      Add {{modalAction}}
     </v-btn>
 
     <v-dialog v-model="dialog" width="500">

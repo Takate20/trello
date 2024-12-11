@@ -7,7 +7,7 @@ import { Status } from "../utils/Task.js";
 const taskStore = useTaskStore();
 const tasks = reactive(taskStore.tasks);
 const dialog = ref(true)
-const editTask = ref(null)
+const editTask = ref(new Task())
 
 const todoTasks = computed(() => tasks.filter(task => task.status === Status.TODO));
 const inProgressTasks = computed(() => tasks.filter(task => task.status === Status.IN_PROGRESS));
@@ -112,6 +112,6 @@ const saveToLocalStorage = () => {
       </v-col>
     </v-row>
 
-    <AddTaskModal :task="editTask" v-model="dialog" :status="Status.DONE"></AddTaskModal>
+    <AddTaskModal :task="editTask" :modal-action="ModalAction.Edit" v-model="dialog" :status="editTask."></AddTaskModal>
   </v-container>
 </template>
