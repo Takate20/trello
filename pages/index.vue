@@ -1,81 +1,77 @@
 <script setup>
-  import {ref, reactive, computed} from "vue";
-  import draggable from "vuedraggable";
-  import {useTaskStore} from "../stores/tasks.js";
-  import {Status} from "../utils/Task.js";
-  import {usePeopleStore} from "../stores/people.js";
+import {ref} from "vue";
+import draggable from "vuedraggable";
+import {useTaskStore} from "../stores/tasks.js";
+import {Status} from "../utils/Task.js";
+import {usePeopleStore} from "../stores/people.js";
 
-  const tasks = useTaskStore().tasks;
-  const dialog = ref(false);
-  const editTask = ref(null);
+const tasks = useTaskStore().tasks;
+const dialog = ref(false);
+const editTask = ref(null);
 
-  const display = ref(useDisplay())
-  const isDragging = ref(false);
+const isDragging = ref(false);
 
-  const todoTasks = computed(() => tasks.filter(task => task.status === Status.TODO));
-  const inProgressTasks = computed(() => tasks.filter(task => task.status === Status.IN_PROGRESS));
-  const doneTasks = computed(() => tasks.filter(task => task.status === Status.DONE));
+const todoTasks = ref([]);
+const inProgressTasks = ref([]);
+const doneTasks = ref([]);
 
-  const peopleStore = usePeopleStore();
+const peopleStore = usePeopleStore();
 
-  const updateTaskStatusAndOrder = (event, newStatus, taskList) => {
-    const {added, moved} = event;
+watchEffect(() => {
+  todoTasks.value = tasks.filter(task => task.status === Status.TODO);
+  inProgressTasks.value = tasks.filter(task => task.status === Status.IN_PROGRESS);
+  doneTasks.value = tasks.filter(task => task.status === Status.DONE);
+})
 
-    if (added) {
-      console.log('add')
-      const task = added.element;
-      const newIndex = added.newIndex;
+const updateTaskStatusAndOrder = (event, newStatus, taskList) => {
+  const {added, moved} = event;
 
-      task.status = newStatus;
+  if(added) {
+    const task = added.element;
+    const newIndex = added.newIndex;
 
-      const oldIndex = tasks.findIndex(t => t === task);
-      tasks.splice(oldIndex, 1);
-      tasks.splice(newIndex, 0, task);
-    }
+    task.status = newStatus;
 
-
-    if (moved) {
-      console.log("move")
-      const {newIndex, oldIndex} = moved;
-      const task = taskList[oldIndex];
-
-      const globalOldIndex = tasks.findIndex(t => t === task);
-      tasks.splice(globalOldIndex, 1);
-      const globalNewIndex = tasks.findIndex(t => taskList[newIndex]);
-      tasks.splice(globalNewIndex, 0, task);
-    }
+    const oldIndex = tasks.findIndex(t => t === task);
+    tasks.splice(oldIndex, 1);
+    tasks.splice(newIndex, 0, task);
 
     saveToLocalStorage();
-  };
+  }
+  if (moved) {
+    saveToLocalStorage();
+  }
+};
 
-  watchEffect(() => {
-    if (editTask.value) {
-      dialog.value = true;
-    }
-  });
+watchEffect(() => {
+  if (editTask.value) {
+    dialog.value = true;
+  }
+});
 
-  watchEffect(() => {
-    if(!dialog.value) {
-      editTask.value = null
-    }
-  })
+watchEffect(() => {
+  if (!dialog.value) {
+    editTask.value = null
+  }
+})
 
-  const saveToLocalStorage = () => {
-    console.log(tasks)
-    localStorage.setItem("taskStore", JSON.stringify(tasks));
-  };
+const saveToLocalStorage = () => {
+  const localTasks = {
+    tasks: [...todoTasks.value, ...inProgressTasks.value, ...doneTasks.value]
+  }
+  localStorage.setItem("taskStore", JSON.stringify(localTasks));
+};
 
 </script>
 
 <template>
-  {{useTaskStore().tasks}}
   <v-container>
     <v-row no-gutters>
       <v-col cols="12">
         <div class="d-flex align-start flex-column flex-md-row mx-auto align-center align-md-start ga-4">
-          <v-card class="pa-5" rounded="xl" :min-width="250" style="background: #101204">
+          <v-card class="pa-5" rounded="xl" :width="250" style="background: #101204">
             <span class="text-white d-block mb-3">TODO</span>
-            <draggable :list="todoTasks" group="tasks" item-key="id" @change="event => updateTaskStatusAndOrder(event, Status.TODO, todoTasks)" @start="isDragging = true" @end="isDragging = false">
+            <draggable v-model="todoTasks" group="tasks" item-key="id" @change="event => updateTaskStatusAndOrder(event, Status.TODO, todoTasks)" @start="isDragging = true" @end="isDragging = false">
               <template #item="{ element: task }">
                 <v-card @click="editTask = task" class="mb-3" :class="{ 'cursor-grab': isDragging }" style="user-select: none; background: #22272B">
                   <v-card-title class="text-white">
@@ -92,9 +88,9 @@
             <AddTaskModal :status="Status.TODO"></AddTaskModal>
           </v-card>
 
-          <v-card class="pa-5" rounded="xl" min-width="250" style="background: #101204">
+          <v-card class="pa-5" rounded="xl" width="250" style="background: #101204">
             <span class="text-white d-block mb-3">In Progress</span>
-            <draggable :list="inProgressTasks" group="tasks" item-key="id" @change="event => updateTaskStatusAndOrder(event, Status.IN_PROGRESS, inProgressTasks)"  @start="isDragging = true" @end="isDragging = false">
+            <draggable v-model="inProgressTasks" group="tasks" item-key="id" @change="event => updateTaskStatusAndOrder(event, Status.IN_PROGRESS, inProgressTasks)" @start="isDragging = true" @end="isDragging = false">
               <template #item="{ element: task }">
                 <v-card @click="editTask = task" class="mb-3" :class="{ 'cursor-grab': isDragging }" style="user-select: none; background: #22272B">
                   <v-card-title class="text-white">
@@ -113,7 +109,7 @@
 
           <v-card class="pa-5" rounded="xl" min-width="250" style="background: #101204">
             <span class="text-white d-block mb-3">Done</span>
-            <draggable :list="doneTasks" group="tasks" item-key="id" @change="event => updateTaskStatusAndOrder(event, Status.DONE, doneTasks)"  @start="isDragging = true" @end="isDragging = false">
+            <draggable v-model="doneTasks" group="tasks" item-key="id" @change="event => updateTaskStatusAndOrder(event, Status.DONE, doneTasks)" @start="isDragging = true" @end="isDragging = false">
               <template #item="{ element: task }">
                 <v-card @click="editTask = task" class="mb-3" :class="{ 'cursor-grab': isDragging }" style="user-select: none; background: #22272B">
                   <v-card-title class="text-white">

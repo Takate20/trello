@@ -45,7 +45,6 @@ const addTask = async () => {
 
 const editTask = async () => {
   const taskStore = useTaskStore();
-  console.log(`editedTask: ${taskData?.value.id}`)
   taskStore.editTask(taskData.value)
   resetForm();
   dialog.value = false;
@@ -80,7 +79,6 @@ const resetForm = () => {
     <v-dialog v-model="dialog" width="500">
       <v-card>
         <v-card-title>
-          {{taskData.creator}}
           {{ props.modalAction === ModalAction.Add ? 'Add New Task' : 'Edit Task' }}
         </v-card-title>
 
