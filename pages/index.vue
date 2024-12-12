@@ -88,7 +88,7 @@ const saveToLocalStorage = () => {
             <AddTaskModal :status="Status.TODO"></AddTaskModal>
           </v-card>
 
-          <v-card class="pa-5" rounded="xl" width="250" style="background: #101204">
+          <v-card class="pa-5" rounded="xl" :width="250" style="background: #101204">
             <span class="text-white d-block mb-3">In Progress</span>
             <draggable v-model="inProgressTasks" group="tasks" item-key="id" @change="event => updateTaskStatusAndOrder(event, Status.IN_PROGRESS, inProgressTasks)" @start="isDragging = true" @end="isDragging = false">
               <template #item="{ element: task }">
@@ -107,7 +107,7 @@ const saveToLocalStorage = () => {
             <AddTaskModal :status="Status.IN_PROGRESS"></AddTaskModal>
           </v-card>
 
-          <v-card class="pa-5" rounded="xl" min-width="250" style="background: #101204">
+          <v-card class="pa-5" rounded="xl" :width="250" style="background: #101204">
             <span class="text-white d-block mb-3">Done</span>
             <draggable v-model="doneTasks" group="tasks" item-key="id" @change="event => updateTaskStatusAndOrder(event, Status.DONE, doneTasks)" @start="isDragging = true" @end="isDragging = false">
               <template #item="{ element: task }">
