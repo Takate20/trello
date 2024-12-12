@@ -43,5 +43,12 @@ export default defineNuxtConfig({
         host: 'localhost',
         port: 3000
     },
-    ssr: false
+    ssr: false,
+
+    publicRuntimeConfig: {
+        baseURL: '/trello',
+    },
+    router: {
+        base: '/trello/',
+    },
 });
